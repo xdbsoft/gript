@@ -3,6 +3,7 @@
 [![Godoc](https://godoc.org/github.com/xdbsoft/gript?status.png)](https://godoc.org/github.com/xdbsoft/gript)
 [![Build Status](https://travis-ci.org/xdbsoft/gript.svg?branch=master)](https://travis-ci.org/xdbsoft/gript)
 [![Coverage](http://gocover.io/_badge/github.com/xdbsoft/gript)](http://gocover.io/_badge/github.com/xdbsoft/gript)
+[![Report](https://goreportcard.com/badge/github.com/xdbsoft/gript)](https://goreportcard.com/report/github.com/xdbsoft/gript)
 
 ## How-to
 
