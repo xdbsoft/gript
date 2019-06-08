@@ -2,6 +2,7 @@ package gript
 
 import (
 	"bytes"
+	"strings"
 )
 
 //Context is an interface allowing access to variable values
@@ -37,10 +38,28 @@ type vm struct {
 }
 
 func (vm *vm) Value(ident string) interface{} {
-	v, found := vm.values[ident]
+
+	parts := strings.Split(ident, ".")
+	current := vm.values
+
+	for i := 0; i < len(parts)-1; i++ {
+		v, found := current[parts[i]]
+		if !found {
+			return nil
+		}
+
+		next, ok := v.(map[string]interface{})
+		if !ok {
+			return nil
+		}
+		current = next
+	}
+
+	v, found := current[parts[len(parts)-1]]
 	if !found {
 		return nil
 	}
+
 	return v
 }
 

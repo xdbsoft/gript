@@ -112,6 +112,12 @@ func TestEvalArithmetic(t *testing.T) {
 	})
 }
 
+func TestEvalAccessObject(t *testing.T) {
+	testEval(t, []testCase{
+		{"payload.a", map[string]interface{}{"payload": map[string]interface{}{"a": 1}}, 1},
+	})
+}
+
 func TestEvalComplex(t *testing.T) {
 
 	testEval(t, []testCase{
@@ -140,6 +146,9 @@ func TestEvalInvalidSyntax(t *testing.T) {
 		{"'a", nil, "Illegal token: 'a'"},
 		{"a", nil, "undefined variable 'a'"},
 		{"a &&  || b", nil, "invalid expression"},
+		{"a.b", nil, "undefined variable 'a.b'"},
+		{"a.b", map[string]interface{}{"a":1}, "undefined variable 'a.b'"},
+		{"a.b", map[string]interface{}{"a":map[string]interface{}{"c":1}}, "undefined variable 'a.b'"},
 	}
 
 	for _, testCase := range testCases {
