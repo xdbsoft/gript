@@ -7,7 +7,7 @@ import (
 
 //Context is an interface allowing access to variable values
 type Context interface {
-	Value(identifier string) interface{}
+	Value(identifier string) (value interface{}, found bool)
 }
 
 //Expression (boolean, numerical, ...) is an obect that can be evaluated against a context
@@ -37,7 +37,7 @@ type vm struct {
 	values map[string]interface{}
 }
 
-func (vm *vm) Value(ident string) interface{} {
+func (vm *vm) Value(ident string) (interface{}, bool) {
 
 	parts := strings.Split(ident, ".")
 	current := vm.values
@@ -45,22 +45,22 @@ func (vm *vm) Value(ident string) interface{} {
 	for i := 0; i < len(parts)-1; i++ {
 		v, found := current[parts[i]]
 		if !found {
-			return nil
+			return nil, false
 		}
 
 		next, ok := v.(map[string]interface{})
 		if !ok {
-			return nil
+			return nil, false
 		}
 		current = next
 	}
 
 	v, found := current[parts[len(parts)-1]]
 	if !found {
-		return nil
+		return nil, false
 	}
 
-	return v
+	return v, true
 }
 
 func (vm *vm) Eval(s string) (interface{}, error) {

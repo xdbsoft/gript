@@ -26,8 +26,18 @@ func (e stringExpression) Eval(c Context) (interface{}, error) {
 type identExpression string
 
 func (e identExpression) Eval(c Context) (interface{}, error) {
-	r := c.Value(string(e))
-	if r == nil {
+
+	switch e {
+	case "true":
+		return true, nil
+	case "false":
+		return false, nil
+	case "nil":
+		return nil, nil
+	}
+
+	r, found := c.Value(string(e))
+	if !found {
 		return nil, fmt.Errorf("undefined variable '%s'", e)
 	}
 	return r, nil

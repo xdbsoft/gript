@@ -122,6 +122,10 @@ func TestEvalComplex(t *testing.T) {
 
 	testEval(t, []testCase{
 		{"a", map[string]interface{}{"a": 1}, 1},
+		{"a", map[string]interface{}{"a": nil}, nil},
+		{"a == nil", map[string]interface{}{"a": nil}, true},
+		{"true", nil, true},
+		{"false", nil, false},
 		{"a > 4 || (a < 2 && a > 0) || a == 6", map[string]interface{}{"a": 1}, true},
 		{"ab > 3+1   ||	(ab < 4-2 && ab > 6%2) ", map[string]interface{}{"ab": 1}, true},
 	})
