@@ -15,7 +15,7 @@
 	)
 		
 	func main() {
-        result, err := Eval(" abc > 3+1   ||	(ab < 4-2 && ab > 6%2) || d < 0", map[string]interface{}{"abc": 1, "d": 1})
+        result, err := Eval(" abc > 3+1   ||	(abc < 4-2 && abc > 6%2) || d < 0", map[string]interface{}{"abc": 1, "d": 1})
 
         //result will contain the boolean true
 
