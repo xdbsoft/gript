@@ -115,6 +115,8 @@ func TestEvalArithmetic(t *testing.T) {
 func TestEvalAccessObject(t *testing.T) {
 	testEval(t, []testCase{
 		{"payload.a", map[string]interface{}{"payload": map[string]interface{}{"a": 1}}, 1},
+		{"payload.A", map[string]interface{}{"payload": struct{A int}{A: 2}}, 2},
+		{"payload.a", map[string]interface{}{"payload": struct{A int}{A: 2}}, 2},
 	})
 }
 
@@ -153,6 +155,7 @@ func TestEvalInvalidSyntax(t *testing.T) {
 		{"a.b", nil, "undefined variable 'a.b'"},
 		{"a.b", map[string]interface{}{"a":1}, "undefined variable 'a.b'"},
 		{"a.b", map[string]interface{}{"a":map[string]interface{}{"c":1}}, "undefined variable 'a.b'"},
+		{"a.B", map[string]interface{}{"a": struct{A int}{A: 2}}, "undefined variable 'a.B'"},
 	}
 
 	for _, testCase := range testCases {

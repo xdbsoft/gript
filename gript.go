@@ -2,6 +2,7 @@ package gript
 
 import (
 	"bytes"
+	"reflect"
 	"strings"
 )
 
@@ -40,27 +41,33 @@ type vm struct {
 func (vm *vm) Value(ident string) (interface{}, bool) {
 
 	parts := strings.Split(ident, ".")
-	current := vm.values
+	var current interface{}
+	current = vm.values
 
-	for i := 0; i < len(parts)-1; i++ {
-		v, found := current[parts[i]]
-		if !found {
-			return nil, false
-		}
+	for i := 0; i < len(parts); i++ {
 
-		next, ok := v.(map[string]interface{})
-		if !ok {
-			return nil, false
+		if currentMap, ok := current.(map[string]interface{}); ok {
+			next, found := currentMap[parts[i]]
+			if !found {
+				return nil, false
+			}
+			current = next
+		} else {
+			currentValue := reflect.ValueOf(current)
+			if currentValue.Kind() != reflect.Struct {
+				return nil, false
+			}
+			nextValue := currentValue.FieldByNameFunc(func(name string) bool {
+				return strings.ToLower(name) == strings.ToLower(parts[i])
+			})
+			if (nextValue == reflect.Value{}) {
+				return nil, false
+			}
+			current = nextValue.Interface()
 		}
-		current = next
 	}
 
-	v, found := current[parts[len(parts)-1]]
-	if !found {
-		return nil, false
-	}
-
-	return v, true
+	return current, true
 }
 
 func (vm *vm) Eval(s string) (interface{}, error) {
