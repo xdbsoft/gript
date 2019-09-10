@@ -40,7 +40,7 @@ func precedence(o string) int {
 		return 6
 	case "+", "-":
 		return 5
-	case "<", "<=", ">", ">=":
+	case "<", "<=", ">", ">=", "in":
 		return 4
 	case "==", "!=":
 		return 3
@@ -165,7 +165,7 @@ main:
 		}
 	}
 
-	if len(operandStack) == 0 {
+	if len(operandStack) == 0 || len(operandStack) > 1 {
 		return nil, errors.New("invalid syntax")
 	}
 

@@ -3,6 +3,8 @@ package gript
 import (
 	"errors"
 	"fmt"
+	"reflect"
+	"strings"
 )
 
 type intExpression int
@@ -163,6 +165,36 @@ func modulo(l, r interface{}) (interface{}, error) {
 	return nil, errors.New("incompatible types in modulo")
 }
 
+func in(l, r interface{}) (interface{}, error) {
+
+	rValue := reflect.ValueOf(r)
+	lValue := reflect.ValueOf(l)
+
+	switch rValue.Kind() {
+	case reflect.Array, reflect.Slice:
+		if !lValue.Type().AssignableTo(rValue.Type().Elem()) {
+			return nil, errors.New("invalid type in operator in")
+		}
+		for i := 0; i < rValue.Len(); i++ {
+			if rValue.Index(i).Interface() == lValue.Interface() {
+				return true, nil
+			}
+		}
+		return false, nil
+	case reflect.Map:
+		if !lValue.Type().AssignableTo(rValue.Type().Key()) {
+			return nil, errors.New("invalid key type in operator in")
+		}
+		return rValue.MapIndex(lValue).IsValid(), nil
+	case reflect.Struct:
+		found := rValue.FieldByNameFunc(func(name string) bool {
+			return strings.ToLower(name) == strings.ToLower(lValue.String())
+		})
+		return found.IsValid(), nil
+	}
+	return nil, errors.New("unsupported types in operator in")
+}
+
 func (e binaryExpression) Eval(c Context) (interface{}, error) {
 
 	l, err := e.left.Eval(c)
@@ -207,6 +239,8 @@ func (e binaryExpression) Eval(c Context) (interface{}, error) {
 		return quotient(l, r)
 	case "%":
 		return modulo(l, r)
+	case "in":
+		return in(l, r)
 	}
 	return nil, fmt.Errorf("Unsupported operator '%s'", e.operator)
 }

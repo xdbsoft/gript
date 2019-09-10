@@ -120,6 +120,18 @@ func TestEvalAccessObject(t *testing.T) {
 	})
 }
 
+func TestEvalIn(t *testing.T) {
+	testEval(t, []testCase{
+		{"'a' in payload", map[string]interface{}{"payload": map[string]interface{}{"a": 1}}, true},
+		{"'b' in payload", map[string]interface{}{"payload": map[string]interface{}{"a": 1}}, false},
+		{"'A' in payload", map[string]interface{}{"payload": struct{A int}{A: 2}}, true},
+		{"'a' in payload", map[string]interface{}{"payload": struct{A int}{A: 2}}, true},
+		{"'b' in payload", map[string]interface{}{"payload": struct{A int}{A: 2}}, false},
+		{"2 in payload", map[string]interface{}{"payload": []int{0,1,2,3}}, true},
+		{"4 in payload", map[string]interface{}{"payload": []int{1,3}}, false},
+	})
+}
+
 func TestEvalComplex(t *testing.T) {
 
 	testEval(t, []testCase{
@@ -141,6 +153,7 @@ func TestEvalInvalidSyntax(t *testing.T) {
 		err        string
 	}{
 		{"", nil, "invalid syntax"},
+		{"1 1", nil, "invalid syntax"},
 		{"1)", nil, "Unbalanced right parenthesis"},
 		{"(1", nil, "invalid expression"},
 		{"#", nil, "Illegal token: '#'"},
@@ -156,6 +169,9 @@ func TestEvalInvalidSyntax(t *testing.T) {
 		{"a.b", map[string]interface{}{"a":1}, "undefined variable 'a.b'"},
 		{"a.b", map[string]interface{}{"a":map[string]interface{}{"c":1}}, "undefined variable 'a.b'"},
 		{"a.B", map[string]interface{}{"a": struct{A int}{A: 2}}, "undefined variable 'a.B'"},
+		{"3 in payload", map[string]interface{}{"payload": map[string]interface{}{"a": 1}}, "invalid key type in operator in"},
+		{"1 in payload", map[string]interface{}{"payload": []string{"test"}}, "invalid type in operator in"},
+		{"5 in payload", map[string]interface{}{"payload": 1}, "unsupported types in operator in"},
 	}
 
 	for _, testCase := range testCases {

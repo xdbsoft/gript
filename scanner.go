@@ -116,7 +116,12 @@ func (s *scanner) scanIdent() (tok token, lit string) {
 	}
 
 	// Otherwise return as a regular identifier.
-	return tokIdentifier, buf.String()
+	v := buf.String()
+	switch v {
+	case "in":
+		return tokOperator, v
+	}
+	return tokIdentifier, v
 }
 
 // scanNumber consumes the current rune and all contiguous runes creating an int or a float.
