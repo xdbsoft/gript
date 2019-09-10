@@ -57,6 +57,9 @@ func or(l, r interface{}) (bool, error) {
 	if !ok {
 		return false, errors.New("boolean expected in OR expression")
 	}
+	if vl { //Fast exit: no need to compute right operand
+		return true, nil
+	}
 	vr, ok := r.(bool)
 	if !ok {
 		return false, errors.New("boolean expected in OR expression")
@@ -68,6 +71,9 @@ func and(l, r interface{}) (bool, error) {
 	vl, ok := l.(bool)
 	if !ok {
 		return false, errors.New("boolean expected in AND expression")
+	}
+	if !vl { //Fast exit: no need to compute right operand
+		return false, nil
 	}
 	vr, ok := r.(bool)
 	if !ok {

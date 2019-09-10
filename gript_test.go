@@ -140,6 +140,14 @@ func TestEvalComplex(t *testing.T) {
 		{"a == nil", map[string]interface{}{"a": nil}, true},
 		{"true", nil, true},
 		{"false", nil, false},
+		{"true || true", nil, true},
+		{"false || false", nil, false},
+		{"false || true", nil, true},
+		{"true || false", nil, true},
+		{"true && true", nil, true},
+		{"false && false", nil, false},
+		{"false && true", nil, false},
+		{"true && false", nil, false},
 		{"a > 4 || (a < 2 && a > 0) || a == 6", map[string]interface{}{"a": 1}, true},
 		{"ab > 3+1   ||	(ab < 4-2 && ab > 6%2) ", map[string]interface{}{"ab": 1}, true},
 	})
@@ -197,15 +205,15 @@ func TestEvalInvalidTypes(t *testing.T) {
 		{"'a' || 0>1", nil, "boolean expected in OR expression"},
 		{"0>1 || 'a'", nil, "boolean expected in OR expression"},
 		{"'a' && 0>1", nil, "boolean expected in AND expression"},
-		{"0>1 && 'a'", nil, "boolean expected in AND expression"},
+		{"0<1 && 'a'", nil, "boolean expected in AND expression"},
 		{"'a' > 0", nil, "incompatible types in comparison"},
 		{"'a' + 0", nil, "incompatible types in sum"},
 		{"'a' - 0", nil, "incompatible types in difference"},
 		{"'a' * 0", nil, "incompatible types in product"},
 		{"'a' / 0", nil, "incompatible types in quotient"},
 		{"'a' % 0", nil, "incompatible types in modulo"},
-		{"'a' > 0 || 1>0", nil, "incompatible types in comparison"},
-		{"1>0 && 'a' > 0", nil, "incompatible types in comparison"},
+		{"('a' > 0) || 1>0", nil, "incompatible types in comparison"},
+		{"1>0 && ('a' > 0)", nil, "incompatible types in comparison"},
 	}
 
 	for _, testCase := range testCases {
