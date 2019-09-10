@@ -150,6 +150,9 @@ func TestEvalComplex(t *testing.T) {
 		{"true && false", nil, false},
 		{"a > 4 || (a < 2 && a > 0) || a == 6", map[string]interface{}{"a": 1}, true},
 		{"ab > 3+1   ||	(ab < 4-2 && ab > 6%2) ", map[string]interface{}{"ab": 1}, true},
+		{"'k' in a.b && a.b.k == 'v1'", map[string]interface{}{"a": struct{B map[string]interface{}}{map[string]interface{}{"k":"v1"}}}, true},
+		{"'k' in a.b && a.b.k == 'v2'", map[string]interface{}{"a": struct{B map[string]interface{}}{map[string]interface{}{"k2":"v2"}}}, false},
+		{"'k' in a.b && a.b.k == 'v3'", map[string]interface{}{"a": struct{B map[string]interface{}}{map[string]interface{}{"k":"v2"}}}, false},
 	})
 }
 

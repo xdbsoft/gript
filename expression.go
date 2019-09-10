@@ -57,9 +57,6 @@ func or(l, r interface{}) (bool, error) {
 	if !ok {
 		return false, errors.New("boolean expected in OR expression")
 	}
-	if vl { //Fast exit: no need to compute right operand
-		return true, nil
-	}
 	vr, ok := r.(bool)
 	if !ok {
 		return false, errors.New("boolean expected in OR expression")
@@ -71,9 +68,6 @@ func and(l, r interface{}) (bool, error) {
 	vl, ok := l.(bool)
 	if !ok {
 		return false, errors.New("boolean expected in AND expression")
-	}
-	if !vl { //Fast exit: no need to compute right operand
-		return false, nil
 	}
 	vr, ok := r.(bool)
 	if !ok {
@@ -206,6 +200,20 @@ func (e binaryExpression) Eval(c Context) (interface{}, error) {
 	l, err := e.left.Eval(c)
 	if err != nil {
 		return nil, err
+	}
+
+	//Fast exit: in some cases, no need to compute right part of the expression
+	switch e.operator {
+	case "&&":
+		vl, ok := l.(bool)
+		if ok && !vl {
+			return false, nil
+		}
+	case "||":
+		vl, ok := l.(bool)
+		if ok && vl {
+			return true, nil
+		}
 	}
 	r, err := e.right.Eval(c)
 	if err != nil {
