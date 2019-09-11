@@ -132,6 +132,15 @@ func TestEvalIn(t *testing.T) {
 	})
 }
 
+func TestEvalMatch(t *testing.T) {
+	testEval(t, []testCase{
+		{"'abc' match 'abc'", nil, true},
+		{"'abc' match 'ab.*'", nil, true},
+		{"'aac' match 'ac.*'", nil, true},
+		{"'aac' match '^ac.*'", nil, false},
+	})
+}
+
 func TestEvalComplex(t *testing.T) {
 
 	testEval(t, []testCase{
@@ -180,9 +189,6 @@ func TestEvalInvalidSyntax(t *testing.T) {
 		{"a.b", map[string]interface{}{"a":1}, "undefined variable 'a.b'"},
 		{"a.b", map[string]interface{}{"a":map[string]interface{}{"c":1}}, "undefined variable 'a.b'"},
 		{"a.B", map[string]interface{}{"a": struct{A int}{A: 2}}, "undefined variable 'a.B'"},
-		{"3 in payload", map[string]interface{}{"payload": map[string]interface{}{"a": 1}}, "invalid key type in operator in"},
-		{"1 in payload", map[string]interface{}{"payload": []string{"test"}}, "invalid type in operator in"},
-		{"5 in payload", map[string]interface{}{"payload": 1}, "unsupported types in operator in"},
 	}
 
 	for _, testCase := range testCases {
@@ -217,6 +223,10 @@ func TestEvalInvalidTypes(t *testing.T) {
 		{"'a' % 0", nil, "incompatible types in modulo"},
 		{"('a' > 0) || 1>0", nil, "incompatible types in comparison"},
 		{"1>0 && ('a' > 0)", nil, "incompatible types in comparison"},
+		{"3 in payload", map[string]interface{}{"payload": map[string]interface{}{"a": 1}}, "invalid key type in operator in"},
+		{"1 in payload", map[string]interface{}{"payload": []string{"test"}}, "invalid type in operator in"},
+		{"5 in payload", map[string]interface{}{"payload": 1}, "unsupported types in operator in"},
+		{"5 match '5'", nil, "unsupported types in operator match"},
 	}
 
 	for _, testCase := range testCases {

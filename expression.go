@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"regexp"
 	"strings"
 )
 
@@ -195,6 +196,18 @@ func in(l, r interface{}) (interface{}, error) {
 	return nil, errors.New("unsupported types in operator in")
 }
 
+func match(l, r interface{}) (interface{}, error) {
+
+	vl, okl := l.(string)
+	vr, okr := r.(string)
+
+	if okl && okr {
+		return regexp.MatchString(vr, vl)
+	}
+
+	return nil, errors.New("unsupported types in operator match")
+}
+
 func (e binaryExpression) Eval(c Context) (interface{}, error) {
 
 	l, err := e.left.Eval(c)
@@ -255,6 +268,8 @@ func (e binaryExpression) Eval(c Context) (interface{}, error) {
 		return modulo(l, r)
 	case "in":
 		return in(l, r)
+	case "match":
+		return match(l, r)
 	}
 	return nil, fmt.Errorf("Unsupported operator '%s'", e.operator)
 }

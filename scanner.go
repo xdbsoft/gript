@@ -118,7 +118,7 @@ func (s *scanner) scanIdent() (tok token, lit string) {
 	// Otherwise return as a regular identifier.
 	v := buf.String()
 	switch v {
-	case "in":
+	case "in", "match":
 		return tokOperator, v
 	}
 	return tokIdentifier, v
